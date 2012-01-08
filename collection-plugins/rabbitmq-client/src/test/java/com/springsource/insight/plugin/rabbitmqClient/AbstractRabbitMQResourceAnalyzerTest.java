@@ -38,8 +38,6 @@ public abstract class AbstractRabbitMQResourceAnalyzerTest {
 
 	private RabbitPluginOperationType operationType;
 
-	static MD5NameGenerator nameGenerator = new MD5NameGenerator();
-
 	public AbstractRabbitMQResourceAnalyzerTest(RabbitPluginOperationType operationType) {
 		super();
 		this.operationType = operationType;
@@ -182,7 +180,7 @@ public abstract class AbstractRabbitMQResourceAnalyzerTest {
 		assertEquals("RabbitMQ", descriptor.getVendor());
 		assertEquals("127.0.0.2", descriptor.getHost());
 		assertEquals(5673, descriptor.getPort());
-		String expectedHash = nameGenerator.getName("RoutingKey#rk127.0.0.25673");
+		String expectedHash = MD5NameGenerator.getName("RoutingKey#rk127.0.0.25673");
 		assertEquals("RabbitMQ:" + expectedHash, descriptor.getName());
 
 		descriptor = externalResourceDescriptors.get(1);        
@@ -192,7 +190,7 @@ public abstract class AbstractRabbitMQResourceAnalyzerTest {
 		assertEquals("RabbitMQ", descriptor.getVendor());
 		assertEquals("127.0.0.1", descriptor.getHost());
 		assertEquals(5672, descriptor.getPort());
-		expectedHash = nameGenerator.getName("Exchange#e RoutingKey#rk127.0.0.15672");
+		expectedHash = MD5NameGenerator.getName("Exchange#e RoutingKey#rk127.0.0.15672");
 		assertEquals("RabbitMQ:" + expectedHash, descriptor.getName());
 	}
 
@@ -215,7 +213,7 @@ public abstract class AbstractRabbitMQResourceAnalyzerTest {
 		assertEquals("RabbitMQ", descriptor.getVendor());
 		assertEquals("127.0.0.1", descriptor.getHost());
 		assertEquals(5672, descriptor.getPort());
-		String expectedHash = nameGenerator.getName(stringTohash);
+		String expectedHash = MD5NameGenerator.getName(stringTohash);
 		assertEquals("RabbitMQ:" + expectedHash, descriptor.getName());
 	}
 

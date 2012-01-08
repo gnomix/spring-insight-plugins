@@ -20,7 +20,6 @@ import java.util.List;
 
 import com.springsource.insight.intercept.metrics.AbstractMetricsGenerator;
 import com.springsource.insight.intercept.metrics.MetricsBag;
-import com.springsource.insight.intercept.metrics.MetricsBag.PointType;
 import com.springsource.insight.intercept.trace.Frame;
 import com.springsource.insight.intercept.trace.Trace;
 
@@ -35,17 +34,15 @@ abstract class AbstractRabbitMetricsGenerator extends AbstractMetricsGenerator {
 	}
 
 	@Override
-	protected void addExtraEndPointMetrics(Trace trace, MetricsBag mb, Boolean isExternal) {
-		if (isExternal){
-			mb.add(createMetricKey(), PointType.COUNTER);
-			addCounterMetricToBag(trace, mb, createMetricKey());
+	protected void addExtraEndPointMetrics(Trace trace, MetricsBag mb, Boolean atLeastOneExternal) {
+		if (atLeastOneExternal){
+			addCounterMetricToBag(trace, mb, createMetricKey(), 1);
 		}
 	}
 
 	@Override
 	protected void addExtraExternalResourceMetrics(Trace trace, MetricsBag mb) {
-		mb.add(createMetricKey(), PointType.COUNTER);
-		addCounterMetricToBag(trace, mb, createMetricKey());
+		addCounterMetricToBag(trace, mb, createMetricKey(), 1);
 	}
 
 	@Override

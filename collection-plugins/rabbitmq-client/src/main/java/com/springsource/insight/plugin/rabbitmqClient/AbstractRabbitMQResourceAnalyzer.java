@@ -29,11 +29,9 @@ import com.springsource.insight.intercept.topology.ExternalResourceType;
 import com.springsource.insight.intercept.topology.MD5NameGenerator;
 import com.springsource.insight.intercept.trace.Frame;
 import com.springsource.insight.intercept.trace.Trace;
-import com.springsource.insight.util.StringUtil;
 import com.springsource.insight.util.time.TimeRange;
 
 public abstract class AbstractRabbitMQResourceAnalyzer implements EndPointAnalyzer, ExternalResourceAnalyzer {
-	static MD5NameGenerator nameGenerator = new MD5NameGenerator();
 
 	static final String RABBIT = "RabbitMQ";
 
@@ -84,7 +82,7 @@ public abstract class AbstractRabbitMQResourceAnalyzer implements EndPointAnalyz
 			Integer portProperty = op.get("port", Integer.class);
 			int port = portProperty == null ? -1 : portProperty;
 
-			String hashString = nameGenerator.getName(label + host + port);
+			String hashString = MD5NameGenerator.getName(label + host + port);
 
 			ExternalResourceDescriptor descriptor = new ExternalResourceDescriptor(queueFrame, RABBIT + ":" + hashString, RABBIT + "-" + label, type, vendor, host, port);
 			queueDescriptors.add(descriptor);            
