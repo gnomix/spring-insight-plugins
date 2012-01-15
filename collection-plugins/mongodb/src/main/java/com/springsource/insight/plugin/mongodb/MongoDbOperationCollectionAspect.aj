@@ -16,16 +16,16 @@
 
 package com.springsource.insight.plugin.mongodb;
 
-import com.springsource.insight.intercept.operation.OperationList;
-import com.springsource.insight.intercept.operation.OperationType;
+import java.util.List;
+
 import org.aspectj.lang.JoinPoint;
 
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.springsource.insight.collection.AbstractOperationCollectionAspect;
 import com.springsource.insight.intercept.operation.Operation;
-
-import java.util.List;
+import com.springsource.insight.intercept.operation.OperationList;
+import com.springsource.insight.intercept.operation.OperationType;
 
 public aspect MongoDbOperationCollectionAspect extends AbstractOperationCollectionAspect {
 
@@ -34,14 +34,22 @@ public aspect MongoDbOperationCollectionAspect extends AbstractOperationCollecti
     public pointcut collectionPoint(): execution(CommandResult DB.command(..));
 
     @Override
-    protected Operation createOperation(final JoinPoint joinPoint) {
-        Operation op = new Operation().label("MongoDB: DB." + joinPoint.getSignature().getName() + "()").type(TYPE);
+    protected Operation createOperation(final JoinPoint jp) {
+        Operation op = new Operation().label("MongoDB: DB." + jp.getSignature().getName() + "()").type(TYPE);
         OperationList opList = op.createList("args");
 
-        List<String> args = MongoArgumentUtils.toString(joinPoint.getArgs());
+        List<String> args = MongoArgumentUtils.toString(jp.getArgs());
         for (String arg : args) {
             opList.add(arg);
         }
+        
+        DB db = (DB) jp.getTarget();
+        try {
+        	op.put("dbName", db.getName());
+			op.put("host", db.getMongo().getAddress().getHost());
+			op.put("port", db.getMongo().getAddress().getPort());
+		} catch (Exception e) {}
+        
         return op;
     }
 }
