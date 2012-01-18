@@ -16,20 +16,17 @@
 
 package com.springsource.insight.plugin.mongodb;
 
-import java.util.List;
+import com.springsource.insight.intercept.operation.OperationType;
 
-import com.springsource.insight.intercept.metrics.AbstractMetricsGenerator;
-import com.springsource.insight.intercept.trace.Frame;
-import com.springsource.insight.intercept.trace.Trace;
+public class MongoDBCollectionOperationAnalyzerTest extends AbstractMongoDBAnalyzerTest {
+    @Override
+    protected AbstractMongoDBAnalyzer createMongoAnalyzer() {
+        return new MongoDBCollectionOperationAnalyzer();
+    }
+    
+    @Override
+    protected OperationType getType() {
+        return MongoDBCollectionOperationAnalyzer.TYPE;
+    }
 
-public class MongoDBMetricsGenerator extends AbstractMetricsGenerator {
-
-	public MongoDBMetricsGenerator() {
-		super(MongoDBAnalyzer.TYPE);
-	}
-	
-	@Override
-	protected List<Frame> getExternalFramesForMetricGeneration(Trace trace) {
-		return trace.getLastFramesOfType(opType);
-	}
 }

@@ -22,6 +22,9 @@
 	<insight:operation-group operation="mongo_db_operation"
 		group="MongoDB" />
 
-	<bean class="com.springsource.insight.plugin.mongodb.MongoDBAnalyzer" />
-	<bean class="com.springsource.insight.plugin.mongodb.MongoDBMetricsGenerator" />
+	<bean class="com.springsource.insight.plugin.mongodb.MongoDBCollectionOperationAnalyzer" />
+	<bean class="com.springsource.insight.plugin.mongodb.MongoDBOperationAnalyzer" />
+
+	<bean class="com.springsource.insight.plugin.mongodb.MongoDBCollectionOperationMetricsGenerator" />
+	<bean class="com.springsource.insight.plugin.mongodb.MongoDBOperationMetricsGenerator" />
 </beans>

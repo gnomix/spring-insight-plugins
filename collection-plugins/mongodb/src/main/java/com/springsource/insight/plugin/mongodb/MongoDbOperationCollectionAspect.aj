@@ -29,13 +29,11 @@ import com.springsource.insight.intercept.operation.OperationType;
 
 public aspect MongoDbOperationCollectionAspect extends AbstractOperationCollectionAspect {
 
-    public static final OperationType TYPE = OperationType.valueOf("mongo_db_operation");
-
     public pointcut collectionPoint(): execution(CommandResult DB.command(..));
 
     @Override
     protected Operation createOperation(final JoinPoint jp) {
-        Operation op = new Operation().label("MongoDB: DB." + jp.getSignature().getName() + "()").type(TYPE);
+        Operation op = new Operation().label("MongoDB: DB." + jp.getSignature().getName() + "()").type(MongoDBOperationAnalyzer.TYPE);
         OperationList opList = op.createList("args");
 
         List<String> args = MongoArgumentUtils.toString(jp.getArgs());

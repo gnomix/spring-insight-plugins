@@ -31,20 +31,23 @@ import com.springsource.insight.intercept.trace.Trace;
 /**
  * 
  */
-public class MongoDBAnalyzer implements ExternalResourceAnalyzer {
+public abstract class AbstractMongoDBAnalyzer implements ExternalResourceAnalyzer {
 
-	public static final OperationType TYPE =  OperationType.valueOf("mongo_db_operation");
+	private OperationType operationType;
+
+	AbstractMongoDBAnalyzer(OperationType operationType) {
+		super();
+		this.operationType = operationType;
+	}
 	
 	public List<ExternalResourceDescriptor> locateExternalResourceName(Trace trace) {
-		List<Frame> dbFrames = trace.getLastFramesOfType(TYPE);
+		List<Frame> dbFrames = trace.getLastFramesOfType(operationType);
+		
 		List<ExternalResourceDescriptor> dbDescriptors = new ArrayList<ExternalResourceDescriptor>();
 		
 		for (Frame dbFrame : dbFrames) {
 			Operation op = dbFrame.getOperation();
 			String host = op.get("host", String.class);           
-			if (host == null || host.isEmpty()) {
-				continue;
-			}
 			Integer portProperty = op.get("port", Integer.class);
 			int port = portProperty == null ? -1 : portProperty;
 			
@@ -53,7 +56,7 @@ public class MongoDBAnalyzer implements ExternalResourceAnalyzer {
 			String mongoHash = MD5NameGenerator.getName(dbName+host+port);
 			
 			dbDescriptors.add(new ExternalResourceDescriptor(dbFrame,
-					"mongo" + ":1:" + mongoHash,
+					"mongo:" + mongoHash,
 					dbName,
 					ExternalResourceType.DATABASE.name(),
 					"MongoDB",
