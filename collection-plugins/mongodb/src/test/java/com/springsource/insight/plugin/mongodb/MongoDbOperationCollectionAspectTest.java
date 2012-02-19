@@ -44,7 +44,7 @@ public class MongoDbOperationCollectionAspectTest
         when(mongo.getAddress()).thenReturn(address);
         DB db = new DBDummy(mongo, "my thing");
         db.command("Hello there");
-        Operation op = (Operation) getLastEntered(Operation.class);
+        Operation op = (Operation) getLastEntered();
         op.finalizeConstruction();
         assertNotNull(op);
         assertEquals("MongoDB: DB.command()", op.getLabel());
@@ -61,7 +61,7 @@ public class MongoDbOperationCollectionAspectTest
         Mongo mongo = mock(Mongo.class);
         DB db = new DBDummy(mongo, "my thing");
         db.command("Hello there");
-        Operation op = (Operation) getLastEntered(Operation.class);
+        Operation op = (Operation) getLastEntered();
         op.finalizeConstruction();
         assertNotNull(op);
         assertEquals("MongoDB: DB.command()", op.getLabel());
