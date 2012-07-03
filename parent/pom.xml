@@ -104,7 +104,7 @@
         </repository>
         <repository>
             <id>spring-milestone</id>
-            <url>http://private.maven.springframework.org/milestone</url>
+            <url>http://maven.springframework.org/milestone</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -576,12 +576,12 @@
         <repository>
             <id>spring-milestone</id>
             <name>Spring Milestone Repository</name>
-            <url>s3://private.maven.springframework.org/milestone</url>
+            <url>s3://maven.springframework.org/milestone</url>
         </repository>    
         <snapshotRepository>
             <id>spring-snapshot</id>
             <name>Spring Snapshot Repository</name>
-            <url>s3://private.maven.springframework.org/snapshot</url>
+            <url>s3://maven.springframework.org/snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 
