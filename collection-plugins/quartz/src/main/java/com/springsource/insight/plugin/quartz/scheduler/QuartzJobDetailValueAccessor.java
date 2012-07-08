@@ -15,15 +15,31 @@
  */
 package com.springsource.insight.plugin.quartz.scheduler;
 
-import com.springsource.insight.intercept.operation.OperationType;
-
 /**
  * 
  */
-public final class QuartzSchedulerDefinitions {
-    private QuartzSchedulerDefinitions() {
-       	throw new UnsupportedOperationException("No instance allowed");
-    }
+public class QuartzJobDetailValueAccessor extends AbstractQuartzValueAccessor {
+	private static class LazyFieldHolder {
+		static final QuartzJobDetailValueAccessor	accessor=new QuartzJobDetailValueAccessor();
+	}
 
-    public static final OperationType   TYPE=OperationType.valueOf("quartz-scheduler");
+	public static QuartzJobDetailValueAccessor getInstance () {
+		return LazyFieldHolder.accessor;
+	}
+
+	QuartzJobDetailValueAccessor () {
+		super("org.quartz.JobDetail");
+	}
+
+	public String getDescription (Object detail) {
+		return getProperty(detail, "description", String.class);
+	}
+	
+	public Object getKey (Object detail) {
+		return getProperty(detail, "key", Object.class);
+	}
+	
+	public Class<?> getJobClass (Object detail) {
+		return getProperty(detail, "jobClass", Class.class);
+	}
 }
