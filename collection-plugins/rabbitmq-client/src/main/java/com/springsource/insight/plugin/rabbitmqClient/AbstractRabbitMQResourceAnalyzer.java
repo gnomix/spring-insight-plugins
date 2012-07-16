@@ -36,15 +36,32 @@ import com.springsource.insight.intercept.trace.FrameUtil;
 import com.springsource.insight.intercept.trace.Trace;
 
 public abstract class AbstractRabbitMQResourceAnalyzer implements EndPointAnalyzer, ExternalResourceAnalyzer {
+	public static final String RABBIT = "RabbitMQ";	
+	/**
+	 * Placeholder string used if no exchange name specified
+	 */
+	public static final String NO_EXCHANGE = "<no-exchange>";
+	/**
+	 * Placeholder string used if no routing key available
+	 */
+	public static final String NO_ROUTING_KEY = "<no-routing-key>";
 
-	static final String RABBIT = "RabbitMQ";	
+	private final RabbitPluginOperationType operationType;
+	private final boolean isIncoming;
 
-	final RabbitPluginOperationType operationType;
-	final boolean isIncoming;
-
-	AbstractRabbitMQResourceAnalyzer(RabbitPluginOperationType type, boolean incoming) {
-		this.operationType = type;
+	protected AbstractRabbitMQResourceAnalyzer(RabbitPluginOperationType type, boolean incoming) {
+		if ((this.operationType=type) == null) {
+			throw new IllegalStateException("No operation type specified");
+		}
 		this.isIncoming = incoming;
+	}
+
+	public final boolean isIncomingResource () {
+		return isIncoming;
+	}
+
+	public final RabbitPluginOperationType getRabbitPluginOperationType () {
+		return operationType;
 	}
 
 	protected abstract String getExchange(Operation op);
@@ -82,63 +99,87 @@ public abstract class AbstractRabbitMQResourceAnalyzer implements EndPointAnalyz
 		}
 
 		List<ExternalResourceDescriptor> queueDescriptors = new ArrayList<ExternalResourceDescriptor>(queueFrames.size());
+		ColorManager					 colorManager=ColorManager.getInstance();
 		for (Frame queueFrame : queueFrames) {
 			Operation op = queueFrame.getOperation();
-
 			String label = buildLabel(op);
 			String host = op.get("host", String.class);            
 			Integer portProperty = op.get("port", Integer.class);
 			int port = portProperty == null ? -1 : portProperty.intValue();
-            String color = ColorManager.getInstance().getColor(op);
-			String hashString = MD5NameGenerator.getName(label + host + port);
+            String color = colorManager.getColor(op);			
 
 			ExternalResourceDescriptor descriptor =
 			        new ExternalResourceDescriptor(queueFrame,
-			                                        RABBIT + ":" + hashString,
-			                                        RABBIT + "-" + label,
-			                                        ExternalResourceType.QUEUE.name(),
-			                                        RABBIT,
-			                                        host,
-			                                        port,
-                                                    color, isIncoming);
+			                                       buildResourceName(label, host, port, isIncoming),
+			                                       buildResourceLabel(label),
+			                                       ExternalResourceType.QUEUE.name(),
+			                                       RABBIT,
+			                                       host,
+			                                       port,
+                                                   color, isIncoming);
 			queueDescriptors.add(descriptor);            
 		}
 
 		return queueDescriptors;
 	}
 
-	private EndPointName getName(String label) {
+	static String buildResourceName (String label, String host, int port, boolean isIncoming) {
+		return buildResourceHash(MD5NameGenerator.getName(createExternalResourceName(label, host, port, isIncoming)));
+	}
+
+	static String buildResourceHash (String hashString) {
+		return RABBIT + ":" + hashString;
+	}
+
+	static String buildResourceLabel (String label) {
+		return RABBIT + "-" + label;
+	}
+
+	protected EndPointName getName(String label) {
 		return EndPointName.valueOf(label);
 	}
 
-	private String getExample(String label) {
-		return operationType.getEndPointPrefix() + label;
+	protected String getExample(String label) {
+		return buildDefaultExample(operationType,  label);
 	}
 
-	private String buildLabel(Operation op) {
-		StringBuilder sb = new StringBuilder();
+	static String buildDefaultExample (RabbitPluginOperationType type, String label) {
+		return type.getEndPointPrefix() + label;
+	}
 
-		String routingKey = getRoutingKey(op);
-		String exchange = getExchange(op);      
+	protected String buildLabel(Operation op) {
+		return buildLabel(getExchange(op), getRoutingKey(op));      
+	}
 
-		boolean hasExchange = !isTrimEmpty(exchange);		
+	protected String buildLabel(String exchange, String routingKey) {
+		return buildDefaultLabel(exchange, routingKey);
+	}
 
-		if (hasExchange) {
-			sb.append("Exchange#").append(exchange);
-		} 
-
-		if (!isTrimEmpty(routingKey)) {				
-			if (hasExchange) {
-				sb.append(" ");
-			}
-			sb.append("RoutingKey#").append(routingKey);
+	static final String buildDefaultLabel (String xcg, String rtKey) {
+		String	exchange=xcg, routingKey=rtKey;
+		boolean hasExchange = !isTrimEmpty(exchange), hasRoutingKey=!isTrimEmpty(routingKey);
+		if (!hasExchange) {
+			exchange = NO_EXCHANGE;
 		}
 
-		return sb.toString();
+		if (!hasRoutingKey) {
+			routingKey = NO_ROUTING_KEY;
+		}
+
+		return new StringBuilder(exchange.length() + routingKey.length() +  24 /* extra text */)
+					.append("Exchange#").append(exchange)
+					.append(' ')
+					.append("RoutingKey#").append(routingKey)
+					.toString()
+					;
+	}
+
+	static String createExternalResourceName (String label, String host, int port, boolean isIncoming) {
+		return label + host + port + isIncoming;
 	}
 
 	private static boolean isTrimEmpty(String str){
-		return (str == null) || (str.trim().length() == 0);
+		return (str == null) || (str.trim().length() <= 0);
 	}
 	
 	public EndPointAnalysis locateEndPoint(Frame frame, int depth) {
@@ -157,6 +198,11 @@ public abstract class AbstractRabbitMQResourceAnalyzer implements EndPointAnalyz
 	
 	public OperationType[] getOperationTypes() {
 	    return new OperationType[] {operationType.getOperationType()};
+	}
+
+	@Override
+	public String toString() {
+		return getRabbitPluginOperationType().name() + "[incoming=" + isIncomingResource() + "]";
 	}
 
 }

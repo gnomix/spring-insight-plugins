@@ -19,7 +19,9 @@ package com.springsource.insight.plugin.rabbitmqClient;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
+import com.springsource.insight.collection.OperationCollector;
 import com.springsource.insight.intercept.operation.Operation;
+import com.springsource.insight.util.ExceptionUtils;
 
 
 public aspect RabbitMQPublishCollectionAspect extends AbstractRabbitMQCollectionAspect {
@@ -57,23 +59,20 @@ public aspect RabbitMQPublishCollectionAspect extends AbstractRabbitMQCollection
             applyConnectionData(op, conn);
         }
         
-        if (props == null) {
-            BasicProperties.Builder builder = new BasicProperties.Builder();
-            props = builder.build();
-        }
-        
         if (props != null) {
             applyPropertiesData(op, props);
         }
-        
-        getCollector().enter(op);
+
+        OperationCollector	collector=getCollector();
+        collector.enter(op);
         colorForward(props, op);
         
         try {
             proceed(exchange,routingKey,mandatory,immediate,props,body);
-            getCollector().exitNormal();
+            collector.exitNormal();
         } catch (Exception e) {
-            getCollector().exitAbnormal(e);
+        	collector.exitAbnormal(e);
+        	ExceptionUtils.rethrowException(e);
         }
     }
 
