@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.springsource.insight.samples</groupId>
 	<artifactId>payme-webapp</artifactId>
-	<version>1.9.0-BETA-RC1</version>
+	<version>1.9.0-BETA-RC2</version>
 	<name>com.springsource.insight.samples:payme-webapp</name>
 	<packaging>war</packaging>
 	
