@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.springsource.insight.samples</groupId>
 	<artifactId>payme-insight-plugin</artifactId>
-	<version>1.9.0-BETA-RC2</version>
+	<version>1.9.0-BETA-RC3</version>
 	<name>com.springsource.insight.samples:payme-insight-plugin</name>
 	<packaging>jar</packaging>
 	
 	<properties>
-		<insight.version>1.9.0-BETA-RC2</insight.version>
+		<insight.version>1.9.0-BETA-RC3</insight.version>
 		<aspectj.version>1.7.0.M1</aspectj.version>
 		<spring.framework.version>3.1.1.RELEASE</spring.framework.version>
 		<junit.version>4.5</junit.version>
