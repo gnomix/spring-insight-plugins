@@ -93,7 +93,7 @@ abstract class AbstractJMSResourceAnalyzer extends AbstractSingleTypeEndpointAna
 		Number portProperty = op.get("port", Number.class);
 		int port = portProperty == null ? -1 : portProperty.intValue();
         String color = colorManager.getColor(op);
-		String hashString = MD5NameGenerator.getName(label + host + port);
+		String hashString = buildNameHash(label, host, port);
 
         return new ExternalResourceDescriptor(queueFrame,
                 JMS + ":" + hashString,
@@ -113,10 +113,29 @@ abstract class AbstractJMSResourceAnalyzer extends AbstractSingleTypeEndpointAna
     	return operationType.getEndPointPrefix() + label;
     }
     
-    static String buildLabel(Operation op) {
+    public static String buildLabel(Operation op) {
     	String type = op.get("destinationType", String.class);
         String name = op.get("destinationName", String.class);
 
-        return type + "#" + name;
+        return buildLabel(type, name);
 	}
+    
+    public static String buildLabel(String destType, String destName) {
+        StringBuilder sb = new StringBuilder();
+        
+        sb.append(destType)
+          .append('#')
+          .append(destName);
+        
+        return sb.toString();
+    }
+    
+    public static String buildNameHash(String label, String host, int port) {
+        StringBuilder sb = new StringBuilder(label);
+        
+        sb.append(host)
+          .append(port);
+        
+        return MD5NameGenerator.getName(sb.toString());
+    }
 }
