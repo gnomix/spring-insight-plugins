@@ -19,13 +19,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.springsource.insight.collection.OperationCollector;
+import com.springsource.insight.collection.AbstractOperationCollector;
 import com.springsource.insight.intercept.operation.Operation;
 
 /**
  * 
  */
-public class OperationListCollector implements OperationCollector {
+public class OperationListCollector extends AbstractOperationCollector {
     private final List<Operation>   _ops=Collections.synchronizedList(new ArrayList<Operation>());
     public OperationListCollector() {
         super();
@@ -35,35 +35,29 @@ public class OperationListCollector implements OperationCollector {
         return _ops;
     }
 
-    public void enter(Operation operation) {
+    public void clearCollectedOperations () {
+        _ops.clear();
+    }
+
+    @Override
+	protected void enterOperation(Operation operation, Long timestamp) {
         _ops.add(operation);
-    }
+	}
 
-    public void exitNormal() {
-        exitNormal(Void.class);
-    }
-
-    public void exitNormal(Object returnValue) {
-        exitAbnormal(null);
-    }
-
-    public void exitAbnormal(Throwable throwable) {
-        if (_ops.isEmpty()) {
-            throw new IllegalStateException("Imbalanced stack frame");
-        }
-    }
-
-    public void exitAndDiscard() {
-        exitAndDiscard(Void.class);
-    }
-
-    public void exitAndDiscard(Object returnValue) {
-        exitNormal(returnValue);
-
+	@Override
+	protected void exitOperation(Long timestamp, Object returnValue, boolean validReturn, Throwable throwable) {
         if (_ops.isEmpty()) {
             throw new IllegalStateException("Imbalanced stack frame");
         }
 
         _ops.remove(_ops.size() - 1);
+	}
+
+    public void exitAndDiscard() {
+    	exitOperation(null, null, false, null);
+    }
+
+    public void exitAndDiscard(Object returnValue) {
+    	exitOperation(null, returnValue, true, null);
     }
 }

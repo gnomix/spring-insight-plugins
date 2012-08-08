@@ -29,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
+import com.springsource.insight.collection.AbstractOperationCollector;
 import com.springsource.insight.collection.OperationCollectionAspectSupport;
 import com.springsource.insight.collection.OperationCollector;
 import com.springsource.insight.intercept.operation.Operation;
@@ -76,7 +77,7 @@ public abstract class TransactionalJpaEntityManagerTestSupport
         return opsList.get(numOps - 1);
     }
 
-    static class OperationListCollector implements OperationCollector {
+    static class OperationListCollector extends AbstractOperationCollector {
         private final List<Operation>   _ops=Collections.synchronizedList(new ArrayList<Operation>());
         public OperationListCollector() {
             super();
@@ -90,36 +91,26 @@ public abstract class TransactionalJpaEntityManagerTestSupport
             _ops.clear();
         }
 
-        public void enter(Operation operation) {
+        @Override
+		protected void enterOperation(Operation operation, Long timestamp) {
             _ops.add(operation);
-        }
+		}
 
-        public void exitNormal() {
-            exitNormal(Void.class);
-        }
-
-        public void exitNormal(Object returnValue) {
-            exitAbnormal(null);
-        }
-
-        public void exitAbnormal(Throwable throwable) {
-            if (_ops.isEmpty()) {
-                throw new IllegalStateException("Imbalanced stack frame");
-            }
-        }
-
-        public void exitAndDiscard() {
-            exitAndDiscard(Void.class);
-        }
-
-        public void exitAndDiscard(Object returnValue) {
-            exitNormal(returnValue);
-
+		@Override
+		protected void exitOperation(Long timestamp, Object returnValue, boolean validReturn, Throwable throwable) {
             if (_ops.isEmpty()) {
                 throw new IllegalStateException("Imbalanced stack frame");
             }
 
             _ops.remove(_ops.size() - 1);
+		}
+
+        public void exitAndDiscard() {
+        	exitOperation(null, null, false, null);
+        }
+
+        public void exitAndDiscard(Object returnValue) {
+        	exitOperation(null, returnValue, true, null);
         }
     }
 }

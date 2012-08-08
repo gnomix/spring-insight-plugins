@@ -43,8 +43,8 @@ import org.mockito.Mockito;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.ReflectionUtils.FieldCallback;
 
+import com.springsource.insight.collection.AbstractOperationCollector;
 import com.springsource.insight.collection.OperationCollectionAspectSupport;
-import com.springsource.insight.collection.OperationCollector;
 import com.springsource.insight.intercept.operation.Operation;
 
 public class DirContextSearchCollectionAspectTest
@@ -131,24 +131,18 @@ public class DirContextSearchCollectionAspectTest
         OperationCollectionAspectSupport    aspectInstance=getAspect();
 
         for (final SearchControlsActions action : SearchControlsActions.values()) {
-            aspectInstance.setCollector(new OperationCollector() {
-                    public void enter(Operation operation) {
-                        Assert.fail(action + ": Unexpected enter call");
-                    }
-    
-                    public void exitNormal() {
-                        Assert.fail(action + ": Unexpected exitNormal call");
-                    }
-    
-                    public void exitNormal(Object returnValue) {
-                        Assert.fail(action + ": Unexpected exitNormal call with value");
-                    }
-    
-                    public void exitAbnormal(Throwable throwable) {
-                        Assert.fail(action + ": Unexpected exitAbnormal call");
-                    }
-    
-                    public void exitAndDiscard() {
+            aspectInstance.setCollector(new AbstractOperationCollector() {
+                    @Override
+					protected void enterOperation(Operation operation, Long timestamp) {
+                        Assert.fail(action + ": Unexpected enter call: " + operation);
+					}
+
+					@Override
+					protected void exitOperation(Long timestamp, Object returnValue, boolean validReturn, Throwable throwable) {
+                        Assert.fail(action + ": Unexpected exit call: " + returnValue + "/" + throwable);
+					}
+
+					public void exitAndDiscard() {
                         Assert.fail(action + ": Unexpected exitAndDiscard call");
                     }
     

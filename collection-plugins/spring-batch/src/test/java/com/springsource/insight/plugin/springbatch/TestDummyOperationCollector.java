@@ -19,13 +19,13 @@ package com.springsource.insight.plugin.springbatch;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.springsource.insight.collection.OperationCollector;
+import com.springsource.insight.collection.AbstractOperationCollector;
 import com.springsource.insight.intercept.operation.Operation;
 
 /**
  * 
  */
-public class TestDummyOperationCollector implements OperationCollector {
+public class TestDummyOperationCollector extends AbstractOperationCollector {
     private final List<Operation>   opsList=new ArrayList<Operation>();
     public TestDummyOperationCollector() {
        super();
@@ -35,29 +35,21 @@ public class TestDummyOperationCollector implements OperationCollector {
         return opsList;
     }
 
-    public void enter(Operation operation) {
+    @Override
+	protected void enterOperation(Operation operation, Long timestamp) {
         opsList.add(operation);
-    }
+	}
 
-    public void exitNormal() {
-        // ignored
-    }
-
-    public void exitNormal(Object returnValue) {
-        // ignored
-    }
-
-    public void exitAbnormal(Throwable throwable) {
-        // ignored
-    }
+	@Override
+	protected void exitOperation(Long timestamp, Object returnValue, boolean validReturn, Throwable throwable) {
+		// ignored
+	}
 
     public void exitAndDiscard() {
         // ignored
     }
 
     public void exitAndDiscard(Object returnValue) {
-        // TODO Auto-generated method stub
-
+    	// ignored
     }
-
 }

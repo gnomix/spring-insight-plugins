@@ -34,7 +34,7 @@ import com.springsource.insight.intercept.trace.ObscuredValueMarker;
 class SocketCollectOperationContext {
     private static final InterceptConfiguration configuration = InterceptConfiguration.getInstance();
     public static final CollectionSettingName    OBSCURED_ADDRESSES_PATTERN_SETTING=
-            new CollectionSettingName("obscured.addresses.pattern", "socket", "Regexp used to obscure addresses");
+            new CollectionSettingName("obscured.addresses.pattern",SocketPluginRuntimeDescriptor.PLUGIN_NAME, "Regexp used to obscure addresses");
     protected static volatile Pattern  OBSCURED_ADDRESSES_PATTERN /* =null - i.e., no obscuring */;
 
     static {

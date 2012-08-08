@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.springsource.insight.collection.AbstractOperationCollector;
 import com.springsource.insight.collection.OperationCollectionAspectSupport;
-import com.springsource.insight.collection.OperationCollector;
 import com.springsource.insight.intercept.operation.Operation;
 
 
@@ -83,25 +83,19 @@ public class JdbcConnectionCloseOperationCollectionAspectTest
     public void testUntrackedConnectionClose () throws SQLException {
         OperationCollectionAspectSupport    aspectInstance=getAspect();
         final AtomicReference<Operation>    opRef=new AtomicReference<Operation>(null);
-        aspectInstance.setCollector(new OperationCollector() {
-                public void enter(Operation operation) {
+        aspectInstance.setCollector(new AbstractOperationCollector() {
+                @Override
+				protected void enterOperation(Operation operation, Long timestamp) {
                     Operation prev=opRef.getAndSet(operation);
                     Assert.assertNull("Multiple enter calls", prev);
-                }
-    
-                public void exitNormal() {
-                    // ignored
-                }
-    
-                public void exitNormal(Object returnValue) {
-                    // ignored
-                }
-    
-                public void exitAbnormal(Throwable throwable) {
-                    // ignored
-                }
-    
-                public void exitAndDiscard() {
+				}
+
+				@Override
+				protected void exitOperation(Long timestamp, Object returnValue, boolean validReturn, Throwable throwable) {
+					// ignored
+				}
+
+				public void exitAndDiscard() {
                     // ignored
                 }
     

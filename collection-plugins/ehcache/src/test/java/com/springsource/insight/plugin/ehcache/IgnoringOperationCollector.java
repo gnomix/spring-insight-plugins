@@ -15,35 +15,29 @@
  */
 package com.springsource.insight.plugin.ehcache;
 
-import com.springsource.insight.collection.OperationCollector;
+import com.springsource.insight.collection.AbstractOperationCollector;
 import com.springsource.insight.intercept.operation.Operation;
 
 /**
  * TODO move it to insight-collection artifact
  */
-public class IgnoringOperationCollector implements OperationCollector {
+public class IgnoringOperationCollector extends AbstractOperationCollector {
     public static final IgnoringOperationCollector  DEFAULT=new IgnoringOperationCollector();
     public IgnoringOperationCollector () {
         super();
     }
 
-    public void enter(Operation operation) {
+    @Override
+	protected void enterOperation(Operation operation, Long timestamp) {
         // ignored
-    }
+	}
 
-    public void exitNormal() {
+	@Override
+	protected void exitOperation(Long timestamp, Object returnValue, boolean validReturn, Throwable throwable) {
         // ignored
-    }
+	}
 
-    public void exitNormal(Object returnValue) {
-        // ignored
-    }
-
-    public void exitAbnormal(Throwable throwable) {
-        // ignored
-    }
-
-    public void exitAndDiscard() {
+	public void exitAndDiscard() {
         // ignored
     }
 
